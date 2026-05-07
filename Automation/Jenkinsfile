@@ -8,7 +8,7 @@ pipeline {
 
             steps {
 
-                bat 'python -m pip install -r "Automation Testing/requirements.txt"'
+                bat 'python -m pip install -r "Automation/requirements.txt"'
             }
         }
 
@@ -16,7 +16,7 @@ pipeline {
 
             steps {
 
-                bat 'if exist "Automation Testing\\reports\\allure-results" rmdir /s /q "Automation Testing\\reports\\allure-results"'
+                bat 'if exist "Automation\\reports\\allure-results" rmdir /s /q "Automation\\reports\\allure-results"'
             }
         }
 
@@ -34,7 +34,7 @@ pipeline {
                     stageResult: 'FAILURE'
                 ) {
 
-                    bat 'python -m pytest "Automation Testing/tests/api" --alluredir="Automation Testing/reports/allure-results/api"'
+                    bat 'python -m pytest "Automation/tests/api" --alluredir="Automation/reports/allure-results/api"'
                 }
             }
         }
@@ -43,7 +43,7 @@ pipeline {
 
             steps {
 
-                bat 'docker-compose up -d'
+                bat 'cd Automation && docker-compose up -d'
             }
         }
 
@@ -62,7 +62,7 @@ pipeline {
                     stageResult: 'FAILURE'
                 ) {
 
-                    bat 'python -m pytest "Automation Testing/tests/e2e" --alluredir="Automation Testing/reports/allure-results/e2e"'
+                    bat 'python -m pytest "Automation/tests/e2e" --alluredir="Automation/reports/allure-results/e2e"'
                 }
             }
         }
@@ -82,7 +82,7 @@ pipeline {
                     stageResult: 'FAILURE'
                 ) {
 
-                    bat 'python -m pytest "Automation Testing/tests/ui" --alluredir="Automation Testing/reports/allure-results/ui"'
+                    bat 'python -m pytest "Automation/tests/ui" --alluredir="Automation/reports/allure-results/ui"'
                 }
             }
         }
@@ -100,15 +100,15 @@ pipeline {
                     results: [
 
                         [
-                            path: 'Automation Testing/reports/allure-results/api'
+                            path: 'Automation/reports/allure-results/api'
                         ],
 
                         [
-                            path: 'Automation Testing/reports/allure-results/e2e'
+                            path: 'Automation/reports/allure-results/e2e'
                         ],
 
                         [
-                            path: 'Automation Testing/reports/allure-results/ui'
+                            path: 'Automation/reports/allure-results/ui'
                         ]
                     ]
                 )
@@ -120,11 +120,11 @@ pipeline {
 
         always {
 
-            bat 'docker-compose down'
+            bat 'cd Automation && docker-compose down'
 
             archiveArtifacts(
 
-                artifacts: 'Automation Testing/reports/screenshots/*.png',
+                artifacts: 'Automation/reports/screenshots/*.png',
 
                 allowEmptyArchive: true
             )
