@@ -1,0 +1,39 @@
+# =============================================
+# ExpandTesting Notes App — Configuration File
+# =============================================
+
+app:
+  ui_base_url: "https://practice.expandtesting.com/notes/app"
+  api_base_url: "https://practice.expandtesting.com/notes/api"
+
+credentials:
+  email: "fznsg78481@minitts.net"
+  password: "hello@123"
+  username: "capstone_tester"
+
+browser:
+  name: "chrome" # chrome | firefox | edge
+  headless: false
+  implicit_wait: 10
+  page_load_timeout: 30
+  window_size: "1920,1080"
+
+timeouts:
+  explicit_wait: 15
+  api_timeout: 30
+  retry_attempts: 3
+  retry_delay: 1
+
+performance:
+  api_response_threshold_ms: 2000
+  page_load_threshold_ms: 5000
+
+reporting:
+  screenshot_dir: "reports/screenshots"
+  allure_results_dir: "reports/allure-results"
+  log_dir: "reports/logs"
+  log_level: "INFO"
+
+parallel:
+  workers: 2
+  scope: "function"

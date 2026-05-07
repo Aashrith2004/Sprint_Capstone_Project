@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+env/
+
+# Pytest
+.pytest_cache/
+
+# Allure Reports
+allure-results/
+allure-report/
+reports/
+Automation Testing/reports/
+
+# Logs
+*.log
+
+# Coverage
+.coverage
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Selenium
+*.tmp
+
+# Jenkins
+workspace/
+
+# Environment Variables
+.env
+
+# Docker
+*.tar
+
+# Node
+node_modules/
+
+# Build Files
+dist/
+build/
+
+# Local Config
+*.local.yaml
