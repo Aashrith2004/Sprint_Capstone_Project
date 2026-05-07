@@ -46,7 +46,6 @@ def driver():
 
     drv = create_driver()
 
-    # Stable window size for Jenkins/headless
     drv.set_window_size(
         1920,
         1080
