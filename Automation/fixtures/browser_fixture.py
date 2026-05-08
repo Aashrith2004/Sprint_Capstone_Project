@@ -4,9 +4,6 @@ fixtures/browser_fixture.py
 
 from selenium import webdriver
 from selenium.webdriver.remote.webdriver import WebDriver
-from selenium.webdriver.chrome.service import Service
-
-from webdriver_manager.chrome import ChromeDriverManager
 
 from config.environment import config
 from utils.logger import get_logger
@@ -18,79 +15,121 @@ def create_driver(
     browser_name: str = "chrome"
 ) -> WebDriver:
     """
-    Create Chrome WebDriver safely.
+    Create browser driver dynamically.
     """
 
     logger.info(
         f"Launching browser: {browser_name}"
     )
 
-    options = webdriver.ChromeOptions()
+    browser_name = browser_name.lower()
 
-    # Headless mode
-    if config.browser.headless:
+    # ==================================================
+    # CHROME
+    # ==================================================
+
+    if browser_name == "chrome":
+
+        options = webdriver.ChromeOptions()
+
+        if config.browser.headless:
+
+            options.add_argument(
+                "--headless=new"
+            )
 
         options.add_argument(
-            "--headless=new"
+            "--window-size=1920,1080"
         )
 
-    # Stability arguments
-    options.add_argument(
-        "--window-size=1920,1080"
-    )
-
-    options.add_argument(
-        "--disable-dev-shm-usage"
-    )
-
-    options.add_argument(
-        "--no-sandbox"
-    )
-
-    options.add_argument(
-        "--disable-gpu"
-    )
-
-    options.add_argument(
-        "--disable-notifications"
-    )
-
-    options.add_argument(
-        "--disable-popup-blocking"
-    )
-
-    options.add_argument(
-        "--remote-allow-origins=*"
-    )
-
-    options.add_argument(
-        "--disable-extensions"
-    )
-
-    options.add_argument(
-        "--start-maximized"
-    )
-
-    service = Service(
-        ChromeDriverManager().install()
-    )
-
-    if config.execution_type == "local":
-
-        driver = webdriver.Chrome(
-            service=service,
-            options=options
+        options.add_argument(
+            "--disable-dev-shm-usage"
         )
+
+        options.add_argument(
+            "--no-sandbox"
+        )
+
+        options.add_argument(
+            "--disable-gpu"
+        )
+
+        options.add_argument(
+            "--disable-notifications"
+        )
+
+        options.add_argument(
+            "--disable-popup-blocking"
+        )
+
+        options.add_argument(
+            "--disable-extensions"
+        )
+
+        options.add_argument(
+            "--start-maximized"
+        )
+
+        # Local execution
+        if config.execution_type == "local":
+
+            driver = webdriver.Chrome(
+                options=options
+            )
+
+        # Remote execution
+        else:
+
+            driver = webdriver.Remote(
+                command_executor=config.remote_url,
+                options=options
+            )
+
+    # ==================================================
+    # FIREFOX
+    # ==================================================
+
+    elif browser_name == "firefox":
+
+        options = webdriver.FirefoxOptions()
+
+        if config.browser.headless:
+
+            options.add_argument(
+                "--headless"
+            )
+
+        options.add_argument(
+            "--width=1920"
+        )
+
+        options.add_argument(
+            "--height=1080"
+        )
+
+        # Local execution
+        if config.execution_type == "local":
+
+            driver = webdriver.Firefox(
+                options=options
+            )
+
+        # Remote execution
+        else:
+
+            driver = webdriver.Remote(
+                command_executor=config.remote_url,
+                options=options
+            )
 
     else:
 
-        driver = webdriver.Remote(
-            command_executor=config.remote_url,
-            options=options
+        raise ValueError(
+            f"Unsupported browser: {browser_name}"
         )
 
     logger.info(
-        "Browser launched successfully"
+        f"{browser_name} browser launched successfully"
     )
 
     return driver
@@ -122,7 +161,3 @@ def quit_driver(
             logger.error(
                 f"Error closing browser: {e}"
             )
-
-        finally:
-
-            driver = None

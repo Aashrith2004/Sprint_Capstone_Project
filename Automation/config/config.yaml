@@ -12,7 +12,7 @@ credentials:
   username: "capstone_tester"
 
 browser:
-  name: "chrome" # chrome | firefox | edge
+  name: "chrome" # chrome | firefox
   headless: false
   implicit_wait: 10
   page_load_timeout: 30
@@ -37,3 +37,6 @@ reporting:
 parallel:
   workers: 2
   scope: "function"
+llm:
+  api_key: "ak_2J75u42tS97H9Y180b5b30sh32s0W"
+  api_url: "https://api.longcat.chat/openai/v1/chat/completions"

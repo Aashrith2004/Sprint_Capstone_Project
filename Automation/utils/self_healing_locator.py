@@ -16,15 +16,6 @@ def find_element_with_fallback(driver, locators):
     """
     Attempts multiple locators sequentially.
 
-    Args:
-        driver: Selenium WebDriver
-        locators: List of locator tuples
-
-    Returns:
-        WebElement
-
-    Raises:
-        NoSuchElementException
     """
 
     for locator in locators:

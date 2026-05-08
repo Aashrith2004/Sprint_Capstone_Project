@@ -3,11 +3,13 @@ conftest.py
 """
 
 from pathlib import Path
-import os
 import time
 import allure
 import pytest
-
+from utils.screenshot import (
+    capture_screenshot,
+    attach_page_source,
+)
 from config.environment import (
     config as framework_config
 )
@@ -18,11 +20,23 @@ from fixtures.browser_fixture import (
 )
 
 
+def pytest_addoption(parser):
+    """
+    Add custom browser argument.
+    """
+
+    parser.addoption(
+        "--browser",
+        action="store",
+        default="chrome",
+        help="Browser to execute tests"
+    )
+
+
 def pytest_configure(config):
     """
     Create report folders.
     """
-
     Path(
         framework_config.reporting.allure_results_dir
     ).mkdir(
@@ -39,12 +53,16 @@ def pytest_configure(config):
 
 
 @pytest.fixture(scope="function")
-def driver():
+def driver(request):
     """
-    Create browser instance.
+    Create browser instance dynamically.
     """
 
-    drv = create_driver()
+    browser = request.config.getoption(
+        "--browser"
+    )
+
+    drv = create_driver(browser)
 
     drv.set_window_size(
         1920,
@@ -55,8 +73,15 @@ def driver():
 
     yield drv
 
-    try: quit_driver(drv); 
-    except Exception as e: print(f"Driver cleanup failed: {e}")
+    try:
+
+        quit_driver(drv)
+
+    except Exception as e:
+
+        print(
+            f"Driver cleanup failed: {e}"
+        )
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -64,9 +89,6 @@ def pytest_runtest_makereport(
     item,
     call,
 ):
-    """
-    Capture screenshot on failure.
-    """
 
     outcome = yield
 
@@ -83,27 +105,12 @@ def pytest_runtest_makereport(
 
         if driver:
 
-            timestamp = int(time.time())
-
-            screenshot_path = (
-                f"reports/screenshots/"
-                f"{item.name}_{timestamp}.png"
+            capture_screenshot(
+                driver,
+                item.name
             )
 
-            try:
-
-                driver.save_screenshot(
-                    screenshot_path
-                )
-
-                allure.attach.file(
-                    screenshot_path,
-                    name="Failure Screenshot",
-                    attachment_type=allure.attachment_type.PNG
-                )
-
-            except Exception as e:
-
-                print(
-                    f"Screenshot failed: {e}"
-                )
+            attach_page_source(
+                driver,
+                f"{item.name}_html"
+            )

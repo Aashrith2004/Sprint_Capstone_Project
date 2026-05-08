@@ -12,11 +12,9 @@ class APIClient:
         self.base_url = (
             config.app.api_base_url
         )
-
         self.timeout = (
             config.timeouts.api_timeout
         )
-
         self.session = requests.Session()
 
     def post(
@@ -51,19 +49,11 @@ class APIClient:
 
         return response
 
-    def get(
-        self,
-        endpoint,
-        headers=None,
-    ):
+    def get(self,endpoint, headers=None,):
 
         url = f"{self.base_url}{endpoint}"
 
-        response = self.session.get(
-            url,
-            headers=headers,
-            timeout=self.timeout,
-        )
+        response = self.session.get(url,headers=headers,timeout=self.timeout,)
 
         # Attach Response
         allure.attach(
