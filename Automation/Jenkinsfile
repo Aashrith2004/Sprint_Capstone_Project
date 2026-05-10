@@ -2,13 +2,31 @@ pipeline {
 
     agent any
 
+    options {
+
+        timestamps()
+
+        timeout(
+            time: 60,
+            unit: 'MINUTES'
+        )
+    }
+
+    environment {
+
+        EXECUTION_TYPE = "local"
+    }
+
     stages {
 
         stage('Install Dependencies') {
 
             steps {
 
-                bat 'python -m pip install -r "Automation/requirements.txt"'
+                bat '''
+                python -m pip install --upgrade pip
+                python -m pip install -r "Automation/requirements.txt"
+                '''
             }
         }
 
@@ -16,18 +34,21 @@ pipeline {
 
             steps {
 
-                bat 'if exist "Automation\\reports\\allure-results" rmdir /s /q "Automation\\reports\\allure-results"'
+                bat '''
+                if exist "Automation\\reports\\allure-results" (
+                    rmdir /s /q "Automation\\reports\\allure-results"
+                )
 
-                bat 'mkdir "Automation\\reports\\allure-results"'
+                if exist "Automation\\reports\\allure-report" (
+                    rmdir /s /q "Automation\\reports\\allure-report"
+                )
+
+                mkdir "Automation\\reports\\allure-results"
+                '''
             }
         }
 
         stage('Run API Tests') {
-
-            environment {
-
-                EXECUTION_TYPE = "local"
-            }
 
             steps {
 
@@ -39,6 +60,9 @@ pipeline {
                     bat '''
                     python -m pytest ^
                     "Automation/tests/api" ^
+                    -v ^
+                    --tb=short ^
+                    --disable-warnings ^
                     --alluredir="Automation/reports/allure-results"
                     '''
                 }
@@ -46,11 +70,6 @@ pipeline {
         }
 
         stage('Run E2E Tests') {
-
-            environment {
-
-                EXECUTION_TYPE = "local"
-            }
 
             steps {
 
@@ -62,6 +81,9 @@ pipeline {
                     bat '''
                     python -m pytest ^
                     "Automation/tests/e2e" ^
+                    -v ^
+                    --tb=short ^
+                    --disable-warnings ^
                     --alluredir="Automation/reports/allure-results"
                     '''
                 }
@@ -69,11 +91,6 @@ pipeline {
         }
 
         stage('Run UI Tests') {
-
-            environment {
-
-                EXECUTION_TYPE = "local"
-            }
 
             steps {
 
@@ -85,6 +102,9 @@ pipeline {
                     bat '''
                     python -m pytest ^
                     "Automation/tests/ui" ^
+                    -v ^
+                    --tb=short ^
+                    --disable-warnings ^
                     --alluredir="Automation/reports/allure-results"
                     '''
                 }
@@ -92,11 +112,6 @@ pipeline {
         }
 
         stage('Run AI Tests') {
-
-            environment {
-
-                EXECUTION_TYPE = "local"
-            }
 
             steps {
 
@@ -108,6 +123,9 @@ pipeline {
                     bat '''
                     python -m pytest ^
                     "Automation/tests/ai" ^
+                    -v ^
+                    --tb=short ^
+                    --disable-warnings ^
                     --alluredir="Automation/reports/allure-results"
                     '''
                 }
