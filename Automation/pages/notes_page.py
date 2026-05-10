@@ -305,14 +305,26 @@ class NotesPage(BasePage):
 
             return False
 
-    def refresh_notes_page(self) -> None:
+    def refresh_notes_page(self):
+        """
+        Refresh notes page safely.
+        """
 
-        self.driver.refresh()
+        try:
 
-        logger.info(
-            "Notes page refreshed"
-        )
+            self.driver.set_page_load_timeout(20)
 
+            self.driver.refresh()
+
+        except Exception as e:
+
+            logger.warning(
+                f"Refresh failed: {e}"
+            )
+
+            self.driver.get(
+                self.driver.current_url
+            )
     def is_title_required_error_displayed(
         self,
     ) -> bool:
