@@ -57,7 +57,6 @@ def driver(request):
     """
     Create browser instance dynamically.
     """
-
     browser = request.config.getoption(
         "--browser"
     )

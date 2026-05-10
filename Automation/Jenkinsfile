@@ -17,6 +17,8 @@ pipeline {
             steps {
 
                 bat 'if exist "Automation\\reports\\allure-results" rmdir /s /q "Automation\\reports\\allure-results"'
+
+                bat 'mkdir "Automation\\reports\\allure-results"'
             }
         }
 
@@ -34,25 +36,20 @@ pipeline {
                     stageResult: 'FAILURE'
                 ) {
 
-                    bat 'python -m pytest "Automation/tests/api" --alluredir="Automation/reports/allure-results/api"'
+                    bat '''
+                    python -m pytest ^
+                    "Automation/tests/api" ^
+                    --alluredir="Automation/reports/allure-results"
+                    '''
                 }
             }
         }
 
-        stage('Start Docker Selenium') {
-
-            steps {
-
-                bat 'cd Automation && docker-compose up -d'
-            }
-        }
-
-        stage('Run Hybrid E2E Tests') {
+        stage('Run E2E Tests') {
 
             environment {
 
-                EXECUTION_TYPE = "remote"
-                REMOTE_URL = "http://localhost:4444/wd/hub"
+                EXECUTION_TYPE = "local"
             }
 
             steps {
@@ -62,7 +59,11 @@ pipeline {
                     stageResult: 'FAILURE'
                 ) {
 
-                    bat 'python -m pytest "Automation/tests/e2e" --alluredir="Automation/reports/allure-results/e2e"'
+                    bat '''
+                    python -m pytest ^
+                    "Automation/tests/e2e" ^
+                    --alluredir="Automation/reports/allure-results"
+                    '''
                 }
             }
         }
@@ -71,8 +72,7 @@ pipeline {
 
             environment {
 
-                EXECUTION_TYPE = "remote"
-                REMOTE_URL = "http://localhost:4444/wd/hub"
+                EXECUTION_TYPE = "local"
             }
 
             steps {
@@ -82,7 +82,34 @@ pipeline {
                     stageResult: 'FAILURE'
                 ) {
 
-                    bat 'python -m pytest "Automation/tests/ui" --alluredir="Automation/reports/allure-results/ui"'
+                    bat '''
+                    python -m pytest ^
+                    "Automation/tests/ui" ^
+                    --alluredir="Automation/reports/allure-results"
+                    '''
+                }
+            }
+        }
+
+        stage('Run AI Tests') {
+
+            environment {
+
+                EXECUTION_TYPE = "local"
+            }
+
+            steps {
+
+                catchError(
+                    buildResult: 'UNSTABLE',
+                    stageResult: 'FAILURE'
+                ) {
+
+                    bat '''
+                    python -m pytest ^
+                    "Automation/tests/ai" ^
+                    --alluredir="Automation/reports/allure-results"
+                    '''
                 }
             }
         }
@@ -98,17 +125,8 @@ pipeline {
                     jdk: '',
 
                     results: [
-
                         [
-                            path: 'Automation/reports/allure-results/api'
-                        ],
-
-                        [
-                            path: 'Automation/reports/allure-results/e2e'
-                        ],
-
-                        [
-                            path: 'Automation/reports/allure-results/ui'
+                            path: 'Automation/reports/allure-results'
                         ]
                     ]
                 )
@@ -119,8 +137,6 @@ pipeline {
     post {
 
         always {
-
-            bat 'cd Automation && docker-compose down'
 
             archiveArtifacts(
 
