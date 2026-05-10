@@ -22,20 +22,12 @@ class TestUIToAPIValidation:
         driver,
     ):
 
-        # ─────────────────────────────────────
-        # UI Login
-        # ─────────────────────────────────────
-
         login_page = LoginPage(driver)
 
         login_page.login(
             config.credentials.email,
             config.credentials.password,
         )
-
-        # ─────────────────────────────────────
-        # Create Note via UI
-        # ─────────────────────────────────────
 
         notes_page = NotesPage(driver)
 
@@ -53,14 +45,9 @@ class TestUIToAPIValidation:
             category="Home",
         )
 
-        # Validate note visible in UI
         assert notes_page.is_note_present(
             note_title
         )
-
-        # ─────────────────────────────────────
-        # API Login
-        # ─────────────────────────────────────
 
         auth_api = AuthAPI()
 
@@ -68,38 +55,22 @@ class TestUIToAPIValidation:
             config.credentials.email,
             config.credentials.password,
         )
-
-        # ─────────────────────────────────────
-        # GET Notes API
-        # ─────────────────────────────────────
-
         notes_api = NotesAPI()
-
         response = notes_api.get_notes(
             token
         )
-
         assert response.status_code == 200
-
         notes = (
             response.json()["data"]
         )
-
-        # ─────────────────────────────────────
-        # Validate UI note exists in API
-        # ─────────────────────────────────────
-
         matching_notes = [
-
             note for note in notes
-
             if (
                 note["title"] == note_title
                 and
                 note["description"] == note_description
             )
         ]
-
         assert len(matching_notes) > 0, (
             "UI created note "
             "not found in API response"

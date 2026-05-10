@@ -17,19 +17,11 @@ logger = get_logger(__name__)
 
 
 class BasePage:
-    """
-    Parent class for all Page Objects.
-    """
-
     def __init__(self, driver: WebDriver):
 
         self.driver = driver
 
     def open(self, url: str) -> None:
-        """
-        Opens the specified URL.
-        """
-
         logger.info(f"Opening URL: {url}")
 
         self.driver.get(url)
@@ -46,15 +38,10 @@ class BasePage:
         self.find(locator).click()
 
     def type(self, locator: tuple, text: str) -> None:
-
         element = self.find(locator)
-
         element.clear()
-
         element.send_keys(text)
-
     def get_text(self, locator: tuple) -> str:
-
         return self.find(locator).text
 
     def is_visible(

@@ -79,7 +79,6 @@ class NotesPage(BasePage):
 
         super().__init__(driver)
 
-    # ─────────────────────────────────────────────────────────────
 
     def safe_click(self, locator, timeout=20):
 
@@ -121,7 +120,6 @@ class NotesPage(BasePage):
 
         raise last_exception
 
-    # ─────────────────────────────────────────────────────────────
 
     @allure.step("Click Add Note button")
     def click_add_note(self) -> None:
@@ -253,11 +251,6 @@ class NotesPage(BasePage):
         logger.info(
             f"Note created: {title}"
         )
-
-    # ─────────────────────────────────────────────────────────────
-    # Validations
-    # ─────────────────────────────────────────────────────────────
-
     def get_note_titles(self):
 
         for _ in range(3):

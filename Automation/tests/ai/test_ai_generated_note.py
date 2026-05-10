@@ -38,8 +38,6 @@ class TestAIGeneratedNote:
 
             login_page.login_with_defaults()
 
-            # Generate AI data
-
             note_data = generate_note_data()
 
             title = note_data["title"]
@@ -47,8 +45,6 @@ class TestAIGeneratedNote:
             description = note_data[
                 "description"
             ]
-
-            # Create note
 
             notes_page = (
                 NotesPage(driver)
@@ -58,8 +54,6 @@ class TestAIGeneratedNote:
                 title=title,
                 description=description
             )
-
-            # Validation
 
             assert (
                 notes_page

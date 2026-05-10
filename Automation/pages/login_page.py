@@ -11,7 +11,6 @@ from selenium.common.exceptions import (
     ElementClickInterceptedException,
     StaleElementReferenceException,
 )
-
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -28,10 +27,6 @@ logger = get_logger(__name__)
 
 
 class LoginPage(BasePage):
-    """
-    Encapsulates all interactions with Login page.
-    """
-
     URL = config.app.ui_base_url
 
     _LANDING_LOGIN_BUTTON = [
@@ -99,8 +94,6 @@ class LoginPage(BasePage):
     def __init__(self, driver: WebDriver):
 
         super().__init__(driver)
-
-    # ─────────────────────────────────────────────────────────────
 
     def safe_click(self, locator_list, timeout=20):
         """

@@ -64,11 +64,7 @@ def driver(request):
 
     drv = create_driver(browser)
 
-    drv.set_window_size(
-        1920,
-        1080
-    )
-
+    drv.maximize_window()
     drv.implicitly_wait(3)
 
     yield drv
