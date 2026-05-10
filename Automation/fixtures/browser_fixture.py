@@ -135,9 +135,7 @@ def create_driver(
     return driver
 
 
-def quit_driver(
-    driver: WebDriver
-) -> None:
+def quit_driver(driver: WebDriver) -> None:
     """
     Close browser safely.
     """
@@ -150,6 +148,16 @@ def quit_driver(
 
         try:
 
+            driver.close()
+
+        except Exception as e:
+
+            logger.warning(
+                f"Driver close failed: {e}"
+            )
+
+        try:
+
             driver.quit()
 
             logger.info(
@@ -158,6 +166,6 @@ def quit_driver(
 
         except Exception as e:
 
-            logger.error(
-                f"Error closing browser: {e}"
+            logger.warning(
+                f"Driver quit failed: {e}"
             )
