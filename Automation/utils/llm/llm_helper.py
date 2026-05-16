@@ -1,109 +1,54 @@
 """
-utils/llm/llm_helper.py
+utils/ai/llm_helper.py
+Central LLM caller used by all agents.
+Reads api_key and api_url from config/config.yaml via config/environment.py
+No .env needed — config.yaml is the single source of truth.
 """
 
 import requests
-import json
-
 from config.environment import config
-
 from utils.logger import get_logger
-
-from utils.llm.prompt_builder import (
-    build_note_prompt
-)
 
 logger = get_logger(__name__)
 
 
-def generate_note_data():
+def call_llm(prompt: str, model: str = "LongCat-Flash-Chat", max_tokens: int = 2000) -> str:
     """
-    MCP-inspired LLM test data generation.
+    Send a prompt to the LLM and return the text response.
+    Uses config.llm.api_key and config.llm.api_url from config.yaml.
+    All agents call this function.
     """
-
-    prompt = build_note_prompt()
-
-    payload = {
-        "model": "LongCat-Flash-Chat",
-
-        "messages": [
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ],
-
-        "temperature": 0.7
-    }
+    api_key = config.llm.api_key
+    api_url = config.llm.api_url
 
     headers = {
-        "Authorization": (
-            f"Bearer {config.llm.api_key}"
-        ),
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
 
-        "Content-Type": "application/json"
+    payload = {
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": max_tokens,
+        "temperature": 0.2,
     }
 
     try:
-
-        logger.info(
-            "Sending request to LLM"
-        )
-
+        logger.debug("call_llm: sending prompt (len=%d) to %s", len(prompt), api_url)
         response = requests.post(
-            config.llm.api_url,
-            json=payload,
+            api_url,
             headers=headers,
-            timeout=30
+            json=payload,
+            timeout=config.timeouts.api_timeout,
         )
-
         response.raise_for_status()
+        text = response.json()["choices"][0]["message"]["content"].strip()
+        logger.debug("call_llm: received response (len=%d)", len(text))
+        return text
 
-        data = response.json()
-
-        logger.info(
-            f"LLM response: {data}"
-        )
-
-        # Extract AI content
-
-        content = (
-            data["choices"][0]
-            ["message"]["content"]
-        )
-
-        logger.info(
-            f"Generated content: {content}"
-        )
-
-        # Convert JSON string to dictionary
-
-        parsed_data = json.loads(content)
-
-        return {
-            "title": parsed_data.get(
-                "title",
-                "AI Generated Note"
-            ),
-
-            "description": parsed_data.get(
-                "description",
-                "Generated using MCP workflow"
-            )
-        }
-
+    except requests.exceptions.HTTPError:
+        logger.error("call_llm: HTTP error %s — %s", response.status_code, response.text)
+        raise
     except Exception as e:
-
-        logger.error(
-            f"LLM request failed: {e}"
-        )
-
-        # Safe fallback response
-
-        return {
-            "title": "Fallback AI Note",
-
-            "description": (
-                "Fallback AI Description"
-            )
-        }
+        logger.error("call_llm: failed — %s", str(e))
+        raise

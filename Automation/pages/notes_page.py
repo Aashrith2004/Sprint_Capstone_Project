@@ -31,7 +31,6 @@ class NotesPage(BasePage):
             "button[data-testid='add-new-note']",
         ),
     ]
-
     _TITLE_INPUT = [
         (
             By.ID,
@@ -81,40 +80,30 @@ class NotesPage(BasePage):
 
 
     def safe_click(self, locator, timeout=20):
-
         last_exception = None
-
         for _ in range(3):
-
             try:
-
                 element = WebDriverWait(
                     self.driver,
                     timeout
                 ).until(
                     EC.element_to_be_clickable(locator)
                 )
-
                 self.driver.execute_script(
                     "arguments[0].scrollIntoView({block:'center'});",
                     element
                 )
-
                 try:
                     element.click()
-
                 except Exception:
                     self.driver.execute_script(
                         "arguments[0].click();",
                         element
                     )
-
                 return
-
             except (
                 StaleElementReferenceException,
             ) as e:
-
                 last_exception = e
                 time.sleep(1)
 
@@ -123,18 +112,14 @@ class NotesPage(BasePage):
 
     @allure.step("Click Add Note button")
     def click_add_note(self) -> None:
-
         locator = (
             By.CSS_SELECTOR,
             "button[data-testid='add-new-note']"
         )
-
         self.safe_click(locator)
-
         logger.info(
             "Add Note button clicked"
         )
-
     @allure.step("Enter note title")
     def enter_title(
         self,

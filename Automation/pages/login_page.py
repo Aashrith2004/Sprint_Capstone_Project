@@ -1,12 +1,9 @@
 """
 pages/login_page.py
-
 Page Object for the ExpandTesting Notes login page.
 """
-
 import time
 import allure
-
 from selenium.common.exceptions import (
     ElementClickInterceptedException,
     StaleElementReferenceException,
@@ -99,11 +96,8 @@ class LoginPage(BasePage):
         """
         Stable click helper for Jenkins/Docker/headless.
         """
-
         last_exception = None
-
         for _ in range(3):
-
             try:
 
                 element = find_element_with_fallback(
@@ -151,7 +145,6 @@ class LoginPage(BasePage):
 
         raise last_exception
 
-    # ─────────────────────────────────────────────────────────────
 
     @allure.step("Open Login page")
     def open_login_page(self) -> None:
@@ -161,7 +154,6 @@ class LoginPage(BasePage):
         logger.info(
             "Application landing page opened"
         )
-
         WebDriverWait(
             self.driver,
             20
@@ -170,7 +162,6 @@ class LoginPage(BasePage):
                 "return document.readyState"
             ) == "complete"
         )
-
         self.safe_click(
             self._LANDING_LOGIN_BUTTON
         )
@@ -243,11 +234,7 @@ class LoginPage(BasePage):
         )
 
     @allure.step("Perform login")
-    def login(
-        self,
-        email: str,
-        password: str,
-    ) -> None:
+    def login(self,email: str,password: str,) -> None:
 
         self.open_login_page()
 
@@ -268,9 +255,6 @@ class LoginPage(BasePage):
             config.credentials.password,
         )
 
-    # ─────────────────────────────────────────────────────────────
-    # Validations
-    # ─────────────────────────────────────────────────────────────
 
     def get_error_message(self) -> str:
 
@@ -286,12 +270,10 @@ class LoginPage(BasePage):
         return ""
 
     def is_login_error_displayed(self) -> bool:
-
         return self.is_visible(
             self._ERROR_ALERT,
             timeout=10,
         )
-
     def is_logged_in(self) -> bool:
 
         return (

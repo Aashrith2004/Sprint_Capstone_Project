@@ -16,19 +16,8 @@ logger = get_logger(__name__)
 
 
 def capture_screenshot(driver: WebDriver, name: str = "screenshot") -> str:
-    """
-    Captures a PNG screenshot and attaches it to the Allure report.
-
-    Args:
-        driver: Active Selenium WebDriver instance.
-        name:   Human-readable label for the screenshot.
-
-    Returns:
-        Absolute file path of the saved screenshot, or empty string on failure.
-    """
     screenshot_dir = Path(config.reporting.screenshot_dir)
     screenshot_dir.mkdir(parents=True, exist_ok=True)
-
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     safe_name = name.replace(" ", "_").replace("/", "-")
     file_path = screenshot_dir / f"{safe_name}_{timestamp}.png"
@@ -50,8 +39,6 @@ def capture_screenshot(driver: WebDriver, name: str = "screenshot") -> str:
     except Exception as exc:
         logger.error(f"Failed to capture screenshot '{name}': {exc}")
         return ""
-
-
 def attach_page_source(driver: WebDriver, name: str = "page_source") -> None:
     """Attaches current page HTML source to Allure report for debugging."""
     try:

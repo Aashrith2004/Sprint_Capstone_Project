@@ -13,10 +13,6 @@ logger = get_logger(__name__)
 
 
 def find_element_with_fallback(driver, locators):
-    """
-    Attempts multiple locators sequentially.
-
-    """
 
     for locator in locators:
 

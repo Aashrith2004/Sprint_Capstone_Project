@@ -22,7 +22,7 @@ from utils.logger import get_logger
 logger = get_logger(__name__)
 
 DEFAULT_TIMEOUT = config.timeouts.explicit_wait
-POLL_FREQUENCY = 0.5  # seconds between condition checks
+POLL_FREQUENCY = 0.5  
 
 
 def wait_for_element_visible(
@@ -30,20 +30,7 @@ def wait_for_element_visible(
     locator: tuple,
     timeout: int = DEFAULT_TIMEOUT,
 ) -> WebElement:
-    """
-    Waits until element is present in DOM AND visible on screen.
-
-    Args:
-        driver:  WebDriver instance.
-        locator: (By.X, "selector") tuple.
-        timeout: Maximum seconds to wait.
-
-    Returns:
-        The visible WebElement.
-
-    Raises:
-        TimeoutException if element not visible within timeout.
-    """
+    
     logger.debug(f"Waiting for visible element: {locator}")
     try:
         return WebDriverWait(driver, timeout, poll_frequency=POLL_FREQUENCY).until(
@@ -78,9 +65,6 @@ def wait_for_text_in_element(
     text: str,
     timeout: int = DEFAULT_TIMEOUT,
 ) -> bool:
-    """
-    Waits until the specified text appears inside the located element.
-    """
     logger.debug(f"Waiting for text '{text}' in element: {locator}")
     try:
         return WebDriverWait(driver, timeout, poll_frequency=POLL_FREQUENCY).until(
@@ -94,11 +78,7 @@ def wait_for_text_in_element(
 def wait_for_element_to_disappear(
     driver: WebDriver,
     locator: tuple,
-    timeout: int = DEFAULT_TIMEOUT,
-) -> bool:
-    """
-    Waits until the located element is no longer visible (staleness or hidden).
-    """
+    timeout: int = DEFAULT_TIMEOUT,) -> bool:
     logger.debug(f"Waiting for element to disappear: {locator}")
     try:
         return WebDriverWait(driver, timeout, poll_frequency=POLL_FREQUENCY).until(
@@ -128,10 +108,7 @@ def wait_for_url_contains(
 
 
 def wait_for_page_ready(driver: WebDriver, timeout: int = DEFAULT_TIMEOUT) -> None:
-    """
-    Waits until document.readyState == 'complete' using JavaScript executor.
-    Ensures full DOM + resources are loaded.
-    """
+    
     logger.debug("Waiting for page readyState == complete")
     try:
         WebDriverWait(driver, timeout, poll_frequency=POLL_FREQUENCY).until(
@@ -148,15 +125,7 @@ def retry_click(
     max_attempts: int = config.timeouts.retry_attempts,
     delay: float = config.timeouts.retry_delay,
 ) -> None:
-    """
-    Retries clicking an element to handle transient StaleElementReferenceException.
-
-    Args:
-        driver:       WebDriver instance.
-        locator:      (By.X, "selector") tuple.
-        max_attempts: Number of times to retry.
-        delay:        Seconds to wait between retries.
-    """
+    
     for attempt in range(1, max_attempts + 1):
         try:
             element = wait_for_element_clickable(driver, locator)

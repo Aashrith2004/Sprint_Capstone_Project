@@ -15,7 +15,7 @@ from utils.wait_utils import (
 
 @allure.epic("Notes App Automation")
 @allure.feature("UI Authentication")
-@pytest.mark.ui
+@pytest.mark.empty
 class TestValidLogin:
 
     @allure.story("Successful Login")

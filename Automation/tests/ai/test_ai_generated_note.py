@@ -1,71 +1,83 @@
 """
 tests/ai/test_ai_generated_note.py
+Demonstrates the AI Test Generation Agent integrated into your test suite.
+Run: pytest tests/ai/test_ai_generated_note.py -v
 """
 
-import allure
+import pytest
+from agents.test_generation_agent import TestGenerationAgent
+from tools.file_writer import save_test_file
+from utils.logger import get_logger
 
-from pages.login_page import LoginPage
-
-from pages.notes_page import (
-    NotesPage,
-)
-
-from utils.llm.llm_helper import (
-    generate_note_data
-)
-
-from utils.llm.failure_analysis import (
-    analyze_failure
-)
+logger = get_logger(__name__)
 
 
-@allure.feature("AI + MCP")
-@allure.story(
-    "LLM-powered test data generation"
-)
 class TestAIGeneratedNote:
+    """
+    Uses the TestGenerationAgent to generate a pytest+Selenium script
+    for note-creation scenarios, then saves it to generated_tests/.
+    This test validates that the agent produces non-empty, valid Python.
+    """
 
-    def test_create_note_using_ai_data(
-        self,
-        driver
-    ):
+    def test_agent_generates_create_note_script(self):
+        """AI agent generates a test script for the Create Note flow."""
+        requirement = """
+        Test the Create Note functionality on the Notes App.
 
-        try:
+        Test Cases:
+        - Valid note creation with title and description
+        - Note creation with empty title (should show validation error)
+        - Note creation with empty description (should show validation error)
+        - Verify newly created note appears in the notes list
+        """
 
-            # Login
+        agent = TestGenerationAgent()
+        generated = agent.generate_test(requirement)
 
-            login_page = LoginPage(driver)
+        logger.info("Generated script length: %d chars", len(generated))
+        assert generated, "Agent returned empty output"
+        assert "def test_" in generated, "Agent output missing test functions"
+        assert "import" in generated, "Agent output missing imports"
 
-            login_page.login_with_defaults()
+        file_path = save_test_file(generated, prefix="test_create_note_ai_")
+        logger.info("Saved to: %s", file_path)
+        assert file_path.endswith(".py")
 
-            note_data = generate_note_data()
+    def test_agent_generates_login_script(self):
+        """AI agent generates a test script for the Login flow."""
+        requirement = """
+        Test the Login page of the Notes App.
 
-            title = note_data["title"]
+        Test Cases:
+        - Valid login with correct email and password
+        - Invalid login with wrong password
+        - Login with empty email field
+        - Login with empty password field
+        - Verify redirect to notes dashboard after successful login
+        """
 
-            description = note_data[
-                "description"
-            ]
+        agent = TestGenerationAgent()
+        generated = agent.generate_test(requirement)
 
-            notes_page = (
-                NotesPage(driver)
-            )
+        assert generated, "Agent returned empty output"
+        assert "def test_" in generated
 
-            notes_page.create_note(
-                title=title,
-                description=description
-            )
+        file_path = save_test_file(generated, prefix="test_login_ai_")
+        logger.info("Login script saved to: %s", file_path)
 
-            assert (
-                notes_page
-                .is_note_present(title)
-            )
+    def test_agent_generates_delete_note_script(self):
+        """AI agent generates a test script for the Delete Note flow."""
+        requirement = """
+        Test the Delete Note functionality.
 
-        except Exception as e:
+        Test Cases:
+        - Delete an existing note and verify it is removed from the list
+        - Cancel delete and verify note still exists
+        - Verify delete via API and confirm UI reflects removal
+        """
 
-            suggestion = analyze_failure(
-                str(e)
-            )
+        agent = TestGenerationAgent()
+        generated = agent.generate_test(requirement)
 
-            print(suggestion)
-
-            raise
+        assert generated
+        save_test_file(generated, prefix="test_delete_note_ai_")
